@@ -1,0 +1,53 @@
+<!--
+<?php
+
+if (!isset($_GET["model"])) {
+    echo "<script> window.location.href = \"../index.php\";</script>";
+}
+?>
+-->
+
+<html>
+    <head>
+			<link rel="stylesheet" href="./css/bootstrap.css">
+			<link rel="stylesheet" href="./css/bootstrap-superhero.css">
+			<link rel="stylesheet" href="./css/jquery-ui.css">
+			<!--<link rel="stylesheet" href="./css/bootstrap-theme.css">-->
+			<link rel="stylesheet" href="./css/melaxThree.css">
+
+			<script src="./scripts/jquery-2.2.4.js"></script>
+			<script src="./scripts/bootstrap.js"></script>
+			<script src="./scripts/jquery-ui.js"></script>
+        
+      <script src="./scripts/progressive/three.js"></script>
+      <script src="./scripts/progressive/OrbitControls.js"></script>
+      <script src="./scripts/progressive/stats.min.js"></script>
+      <script src="./scripts/progressive/SubdivisionModifier.js"></script>
+      <script src="./scripts/progressive/SimplifyModifier.js"></script>
+      <script src="./scripts/progressive/ProgModelEditor.js"></script>
+        
+        <script>
+            $(document).ready(function (){
+								$.ajax({
+									url: "/askModel",
+									success: runEditor
+								});
+                                //TODO: return of getDom is empty because is called before model is loaded
+                //$("#mainDiv").append(progModelEditor.getDom());
+            });
+
+						function runEditor(modelName){
+							//var modelName = "<?php echo $_GET["model"]?>";
+							var progModelEditor = new ProgModelEditor();
+							console.log("modelName: " + modelName);
+							progModelEditor.loadModel(modelName);
+						};
+
+        </script>
+    </head>
+    <body>
+        <div id="mainDiv">
+            
+        </div>
+    </body>
+</html>
