@@ -3,18 +3,23 @@ var ProgModelEditor = (function () {
 
     var domContainer;
     var stats;
-    var loader, camera, controls, scene, renderer, geometry, subdividedGeometry, meshMaterials, model, light;
+    var loader, camera, controls, scene, renderer, geometry, subdividedGeometry, meshMaterials, light;
 
     var info;
     var range = 1;
     var rangeInput;
     var subdivisions = 0;
+		//var step = 0.0001;
+		var step = 0.5;
     var subdivisionMod;
     var simplifyMod;
     var sortedGeometry;
 
     var simplifiedVertices = 0;
     var simplifiedFaces = 0;
+
+		var btnCalcDiffs;
+		var lods = []; // holds the faces for every LOD, vertices should not be kept here as they do not change
 
     instance.loadModel = function (modelName) {
         var modelPath = "";
@@ -74,7 +79,7 @@ var ProgModelEditor = (function () {
             new THREE.MeshBasicMaterial({color: 0x405040, wireframe: true, opacity: 0.8, transparent: true})
         ];
         
-        changeLOD(range);
+        updateSceneModel(changeLOD(range).model);
 
         renderer = new THREE.WebGLRenderer({antialias: true}); // WebGLRenderer CanvasRenderer
         renderer.setClearColor(0x2B3E50);
@@ -88,9 +93,12 @@ var ProgModelEditor = (function () {
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
 
+				createCalcDiffsBtn();
+				domContainer.appendChild(btnCalcDiffs);
+
         createRangeInput();
         domContainer.appendChild(rangeInput);
-
+				
         $("#mainDiv").append(domContainer);
 
         window.addEventListener('resize', onWindowResize, false);
@@ -107,6 +115,8 @@ var ProgModelEditor = (function () {
         var model;
         var modelFaces = [];
         var modelGeometry = new THREE.Geometry();
+
+				var result = {};
 
         t = t * r | 0;
 
@@ -147,12 +157,25 @@ var ProgModelEditor = (function () {
         modelGeometry.vertices = subdividedGeometry.vertices;
         modelGeometry.faces = modelFaces;
         
-        scene.remove(scene.getObjectByName("model"));
-        
         model = THREE.SceneUtils.createMultiMaterialObject(modelGeometry, meshMaterials);
         model.name = "model";        
-        scene.add(model);
+
+				//console.log(model);
+
+				result.geometry = modelGeometry.clone();
+				//TODO: propably the name 'model' should be changed to 'modelToRender' or something
+				result.model = model;
+				//return model;
+
+				//console.log(result.geometry);
+
+				return result;
     }
+
+		function updateSceneModel(model){
+			scene.remove(scene.getObjectByName("model"));
+			scene.add(model);		
+		}
 
     function updateInfo() {
         console.log("updateInfo not implemented yet");
@@ -168,7 +191,8 @@ var ProgModelEditor = (function () {
         rangeInput.setAttribute("type", "range");
         rangeInput.setAttribute("min", 0);
         rangeInput.setAttribute("max", 1);
-        rangeInput.setAttribute("step", 0.0001);
+        //rangeInput.setAttribute("step", 0.0001);
+				rangeInput.setAttribute("step", step);
         rangeInput.style.position = 'absolute';
         rangeInput.style.textAlign = 'center';
         rangeInput.style.width = '50%';
@@ -178,9 +202,80 @@ var ProgModelEditor = (function () {
         $(rangeInput).on("input change", function () {
             range = rangeInput.value;
             //console.log(range);
-            changeLOD(range);
+            updateSceneModel(changeLOD(range).model);
         });
     }
+
+		function createCalcDiffsBtn(){
+			btnCalcDiffs = document.createElement("button");
+			btnCalcDiffs.type = "button";
+			btnCalcDiffs.className = "btn btn-primary btn-md";
+			btnCalcDiffs.innerHTML = ("Calculate LOD Diffs");
+			btnCalcDiffs.style.position = "absolute";
+			btnCalcDiffs.style.bottom = "50px";
+			btnCalcDiffs.style.left = '0%';
+
+			//TODO: create the click listener
+			$(btnCalcDiffs).click(function(){
+				cacheLODs();
+				sendLODs();
+			});
+		}
+
+		function cacheLODs(){
+			var currentLOD;
+			lods = [];
+
+			for(var currentRange = 0; currentRange <= 1; currentRange += step){
+				var uniqueFaces = [];
+				currentLOD = changeLOD(currentRange);
+
+				for(var faceIndex = 0; faceIndex < currentLOD.geometry.faces.length; faceIndex++){
+					if(uniqueFace(currentLOD.geometry.faces, faceIndex)){
+						uniqueFaces.push(currentLOD.geometry.faces[faceIndex]);
+					}
+				}
+
+				lods.push(uniqueFaces);
+			}
+
+			console.log("lods cahed");
+			console.log(lods);
+		}
+
+		// returns true if face is unique in the faces array
+		function uniqueFace(facesArr, faceIndex){
+			var a = facesArr[faceIndex].a;
+			var b = facesArr[faceIndex].b;
+			var c = facesArr[faceIndex].c;
+
+			for(var i = 0; i < faceIndex; i++){
+				if(a === facesArr[i].a && b === facesArr[i].b && c === facesArr[i].c){
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		function sendLODs(){
+			var dataToSend = JSON.stringify(lods);
+			var dataToSendSize = dataToSend.length;
+
+			console.log("sending lods");
+			console.log("data size: " + dataToSendSize);
+			//console.log(dataToSend);
+
+			$.ajax({
+				url: "/sendlods",
+				type: "post",
+				dataType: "json",
+				data: JSON.stringify(lods),
+				success: function(){
+					console.log("lods successfully sent");
+				}
+			});
+		}
 
     function animate() {
         requestAnimationFrame(animate);
