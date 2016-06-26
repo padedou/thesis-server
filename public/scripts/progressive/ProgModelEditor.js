@@ -19,7 +19,8 @@ var ProgModelEditor = (function () {
     var simplifiedFaces = 0;
 
 		var btnCalcDiffs;
-		var lods = []; // holds the faces for every LOD, vertices should not be kept here as they do not change
+		var lods = []; // holds the faces for every LOD, vertices should not be kept here as they do not change.
+		var progMesh = {}; // the 'progressive mesh' object to be sent.
 
     instance.loadModel = function (modelName) {
         var modelPath = "";
@@ -34,6 +35,9 @@ var ProgModelEditor = (function () {
                 break;
 						case "Cow":
 								modelPath = "scripts/progressive/models/cow.js";
+								break;
+						case "Torus Decimated":
+								modelPath = "scripts/progressive/models/TorusDecimated.js";
 								break;
         }
 
@@ -224,6 +228,7 @@ var ProgModelEditor = (function () {
 
 		function cacheLODs(){
 			var currentLOD;
+			progMesh = {};
 			lods = [];
 
 			for(var currentRange = 0; currentRange <= 1; currentRange += step){
@@ -232,15 +237,25 @@ var ProgModelEditor = (function () {
 
 				for(var faceIndex = 0; faceIndex < currentLOD.geometry.faces.length; faceIndex++){
 					if(uniqueFace(currentLOD.geometry.faces, faceIndex)){
-						uniqueFaces.push(currentLOD.geometry.faces[faceIndex]);
+						var currentFace = currentLOD.geometry.faces[faceIndex];
+						var tempFace = {};
+
+						tempFace.a = currentFace.a;
+						tempFace.b = currentFace.b;
+						tempFace.c = currentFace.c;
+						//uniqueFaces.push(currentLOD.geometry.faces[faceIndex]);
+						uniqueFaces.push(tempFace);
 					}
 				}
 
 				lods.push(uniqueFaces);
 			}
 
+			progMesh.vertices = currentLOD.geometry.vertices;
+			progMesh.lods = lods;
+
 			console.log("lods cahed");
-			console.log(lods);
+			//console.log(lods);
 		}
 
 		// returns true if face is unique in the faces array
@@ -265,16 +280,25 @@ var ProgModelEditor = (function () {
 			console.log("sending lods");
 			console.log("data size: " + dataToSendSize);
 			//console.log(dataToSend);
+			console.log(progMesh);
 
 			$.ajax({
 				url: "/sendlods",
 				type: "post",
 				dataType: "json",
-				data: JSON.stringify(lods),
-				success: function(){
+				//data: JSON.stringify(lods),
+				data: {"progMesh": JSON.stringify(progMesh)},
+				success: function(data){
 					console.log("lods successfully sent");
+					console.log(data);
 				}
 			});
+			/*
+			for(var i = 0; i < lods.length; i++){
+				var currentFace = {};
+				currentFace.a = 
+			}
+			*/
 		}
 
     function animate() {
