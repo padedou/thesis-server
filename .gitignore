@@ -1,0 +1,14 @@
+*.swp
+# 'Delta LOD' file type
+*.dl
+public/css/bootstrap.css
+public/css/bootstrap-superhero.css
+public/css/bootstrap-theme.css
+public/css/jquery-ui.css
+public/fonts/*
+public/scripts/bootstrap.js
+public/scripts/jquery-2.2.4.js
+public/scripts/jquery-ui.js
+node_modules
+tmp
+vcdiff.js
