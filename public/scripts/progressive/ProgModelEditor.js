@@ -274,20 +274,23 @@ var ProgModelEditor = (function () {
 		}
 
 		function sendLODs(){
-			var dataToSend = JSON.stringify(lods);
-			var dataToSendSize = dataToSend.length;
+			//var dataToSend = JSON.stringify(lods);
+			//var dataToSendSize = dataToSend.length;
+			var dataToSend = JSON.stringify(progMesh);
+			console.log("dataToSend.length = " + dataToSend.length);
 
-			console.log("sending lods");
-			console.log("data size: " + dataToSendSize);
+			//console.log("sending lods");
+			//console.log("data size: " + dataToSendSize);
 			//console.log(dataToSend);
-			console.log(progMesh);
+			//console.log(progMesh);
 
 			$.ajax({
 				url: "/sendlods",
 				type: "post",
 				dataType: "json",
 				//data: JSON.stringify(lods),
-				data: {"progMesh": JSON.stringify(progMesh)},
+				//data: {"progMesh": JSON.stringify(progMesh)},
+				data: {"progMesh": dataToSend},
 				success: function(data){
 					console.log("lods successfully sent");
 					console.log(data);
