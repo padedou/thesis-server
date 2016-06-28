@@ -9,6 +9,8 @@ public/fonts/*
 public/scripts/bootstrap.js
 public/scripts/jquery-2.2.4.js
 public/scripts/jquery-ui.js
+public/scripts/progressive/models/*
 node_modules
+draft
 tmp
 vcdiff.js

@@ -1,0 +1,103 @@
+<html>
+	<head>
+		<!--
+		<link rel="stylesheet" href="./css/bootstrap.css">
+		<link rel="stylesheet" href="./css/bootstrap-superhero.css">
+		<link rel="stylesheet" href="./css/jquery-ui.css">
+		<link rel="stylesheet" href="./css/melaxThree.css">
+		-->
+		<link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'></link> 
+
+		<script src="./scripts/jquery-2.2.4.js"></script>
+		<!-- <script src="./scripts/bootstrap.js"></script> -->
+		<!-- <script src="./scripts/jquery-ui.js"></script> -->
+		<script src='http://www.x3dom.org/download/x3dom.js'> </script> 
+		<script src="./scripts/progressive/vcdiff.js"></script>
+
+		<script>
+			$(document).ready(function(){
+				var vertices;
+				var vcdiff = new diffable.Vcdiff();
+				vcdiff.blockSize = 10;
+				console.log("document loaded :)");
+
+				$.ajax({
+					url: "/getVertices",
+					success: function(data){
+						vertices = JSON.parse(data);
+						$("#modelCoordinate").attr("point", vertices);
+						setTimeout(nextLOD, 500);
+					}
+				});
+
+				function nextLOD(){
+					$.ajax({
+						url: "/nextLOD",
+						success: function(data){
+							setTimeout(nextLOD, 2000);
+							if(data === "restart"){
+								$("#modelIFS").attr("coordIndex", "");
+							}else{
+								var oldCoordIndex = $("#modelIFS").attr("coordIndex");
+								var newCoordIndex = vcdiff.decode(oldCoordIndex, JSON.parse(data));
+								//console.log(newCoordIndex);
+								$("#modelIFS").attr("coordIndex", newCoordIndex);
+							}
+						}
+					});
+				};
+				/*
+				$.ajax({
+					url: "/getVertices",
+					success: function(data){
+						vertices = JSON.parse(data);
+						//console.log(vertices);
+						$("#modelCoordinate").attr("point", vertices);
+						$("#btnNextLOD").click(function(){
+							$.ajax({
+								url: "nextLOD",
+								success: function(data){
+									if(data === "restart"){
+										$("#modelIFS").attr("coordIndex", "");
+									}else{
+										var oldCoordIndex = $("#modelIFS").attr("coordIndex");
+										var newCoordIndex = vcdiff.decode(oldCoordIndex, JSON.parse(data));
+										//console.log(newCoordIndex);
+										$("#modelIFS").attr("coordIndex", newCoordIndex);
+									}
+								}
+							});
+						});
+					}
+				});
+				*/
+			});
+		</script>
+
+	</head>
+	<body>
+		<x3d width="800px" height="600px">
+			<scene>
+				<Transform translation="0 0 -5">
+				<shape>
+					<appearance>
+						<material 
+							diffuseColor="0.800 0.640 0.480"
+							specularColor="0.130 0.126 0.401"
+							emissiveColor="0.000 0.000 0.000"
+							ambientIntensity="0.333"
+							shininess="0.098"
+							transparency="0.0"
+						/>
+					</appearance>
+					<IndexedFaceSet id="modelIFS" solid="true" coordIndex=" ">
+						<Coordinate id="modelCoordinate" point="" />
+					</IndexedFaceSet>
+				</shape>
+				</Transform>
+	<Viewpoint DEF="CA_Camera" bind="true" fieldOfView="0.5"/>
+			</scene>
+		</x3d>	
+		<!--<button id="btnNextLOD">next lod</button>-->
+	</body>
+</html>

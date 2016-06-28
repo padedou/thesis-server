@@ -10,7 +10,7 @@ var ProgModelEditor = (function () {
     var rangeInput;
     var subdivisions = 0;
 		//var step = 0.0001;
-		var step = 0.5;
+		var step = 0.2;
     var subdivisionMod;
     var simplifyMod;
     var sortedGeometry;
@@ -19,6 +19,7 @@ var ProgModelEditor = (function () {
     var simplifiedFaces = 0;
 
 		var btnCalcDiffs;
+		var btnShowModel;
 		var lods = []; // holds the faces for every LOD, vertices should not be kept here as they do not change.
 		var progMesh = {}; // the 'progressive mesh' object to be sent.
 
@@ -39,6 +40,16 @@ var ProgModelEditor = (function () {
 						case "Torus Decimated":
 								modelPath = "scripts/progressive/models/TorusDecimated.js";
 								break;
+						case "suzanne2":
+								modelPath = "scripts/progressive/models/suzanne2.js";
+								break;
+						case "suzanne3":
+								modelPath = "scripts/progressive/models/suzanne3.js";
+								break;
+						case "Torus Full":
+							modelPath = "scripts/progressive/models/torusFull.js";
+							break;
+
         }
 
         loader.load(modelPath, function (g, m) {
@@ -55,7 +66,7 @@ var ProgModelEditor = (function () {
         domContainer = document.createElement("div");
 
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
-        camera.position.z = 500;
+        camera.position.z = 20;
 
         scene = new THREE.Scene();
 
@@ -99,6 +110,9 @@ var ProgModelEditor = (function () {
 
 				createCalcDiffsBtn();
 				domContainer.appendChild(btnCalcDiffs);
+
+				createShowModelBtn();
+				domContainer.appendChild(btnShowModel);
 
         createRangeInput();
         domContainer.appendChild(rangeInput);
@@ -216,13 +230,26 @@ var ProgModelEditor = (function () {
 			btnCalcDiffs.className = "btn btn-primary btn-md";
 			btnCalcDiffs.innerHTML = ("Calculate LOD Diffs");
 			btnCalcDiffs.style.position = "absolute";
-			btnCalcDiffs.style.bottom = "50px";
+			btnCalcDiffs.style.bottom = "100px";
 			btnCalcDiffs.style.left = '0%';
 
-			//TODO: create the click listener
 			$(btnCalcDiffs).click(function(){
 				cacheLODs();
 				sendLODs();
+			});
+		}
+
+		function createShowModelBtn(){
+			btnShowModel = document.createElement("button");
+			btnShowModel.type = "button";
+			btnShowModel.className = "btn btn-success btn-md";
+			btnShowModel.innerHTML = "Show model";
+			btnShowModel.style.position = "absolute";
+			btnShowModel.style.bottom = "50px";
+			btnShowModel.style.left = "0%";
+
+			$(btnShowModel).click(function(){
+				window.location.replace("http://localhost:3000/modelViewer");
 			});
 		}
 

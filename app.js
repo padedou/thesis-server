@@ -16,6 +16,8 @@ var coordIndexArr = [];
 var lodDeltas = [];
 var result // will be saved as a *.dl file
 
+var currentLOD = 0;
+
 vcdiff.blockSize = 10;
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -58,6 +60,25 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 	//res.end();
 });
 
+//TODO: this is for exhibition purposes
+app.get("/modelViewer", function(req, res){
+	res.sendFile(path.join(__dirname, "views/modelViewer.html"));
+});
+
+app.get("/getVertices", function(req, res){
+	res.send(JSON.stringify(result.vertices));
+});
+
+app.get("/nextLOD", function(req, res){
+	if(currentLOD < result.lodDeltas.length){
+		res.send(JSON.stringify(result.lodDeltas[currentLOD]));
+		currentLOD++;
+	}else{
+		res.send("restart");
+		currentLOD = 0;
+	}
+});
+
 app.listen(3000, function () {
   console.log('app listening on port 3000');
 });
@@ -72,7 +93,7 @@ function setCoordIndex(){
 }
 
 function setLODDeltas(){
-	var currentCoordIndex = "";
+	var currentCoordIndex = " ";
 
 	if(coordIndexArr.length < 2){
 		return;
