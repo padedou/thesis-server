@@ -227,7 +227,7 @@ var ProgModelEditor = (function () {
 		function createCalcDiffsBtn(){
 			btnCalcDiffs = document.createElement("button");
 			btnCalcDiffs.type = "button";
-			btnCalcDiffs.className = "btn btn-primary btn-md";
+			btnCalcDiffs.className = "btn btn-success btn-md";
 			btnCalcDiffs.innerHTML = ("Calculate LOD Diffs");
 			btnCalcDiffs.style.position = "absolute";
 			btnCalcDiffs.style.bottom = "100px";
@@ -242,15 +242,17 @@ var ProgModelEditor = (function () {
 		function createShowModelBtn(){
 			btnShowModel = document.createElement("button");
 			btnShowModel.type = "button";
-			btnShowModel.className = "btn btn-success btn-md";
+			btnShowModel.className = "btn btn-primary btn-md";
 			btnShowModel.innerHTML = "Show model";
 			btnShowModel.style.position = "absolute";
 			btnShowModel.style.bottom = "50px";
 			btnShowModel.style.left = "0%";
 
+			/*
 			$(btnShowModel).click(function(){
 				window.location.replace("http://localhost:3000/modelViewer");
 			});
+			*/
 		}
 
 		function cacheLODs(){
@@ -321,6 +323,12 @@ var ProgModelEditor = (function () {
 				success: function(data){
 					console.log("lods successfully sent");
 					console.log(data);
+					
+					$(btnShowModel).removeClass("btn-primary");
+					$(btnShowModel).addClass("btn-success");
+					$(btnShowModel).click(function(){
+						window.location.replace("http://localhost:3000/modelViewer");
+					});
 				}
 			});
 			/*

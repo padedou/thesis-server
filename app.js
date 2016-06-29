@@ -79,7 +79,7 @@ app.get("/nextLOD", function(req, res){
 	}
 });
 
-app.listen(3000, function () {
+app.listen(3000, '0.0.0.0', function () {
   console.log('app listening on port 3000');
 });
 
