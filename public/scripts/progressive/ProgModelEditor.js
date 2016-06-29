@@ -321,13 +321,15 @@ var ProgModelEditor = (function () {
 				//data: {"progMesh": JSON.stringify(progMesh)},
 				data: {"progMesh": dataToSend},
 				success: function(data){
+					var redirectURL = "http://" + window.location.hostname + ":3000/modelViewer";
 					console.log("lods successfully sent");
 					console.log(data);
 					
 					$(btnShowModel).removeClass("btn-primary");
 					$(btnShowModel).addClass("btn-success");
 					$(btnShowModel).click(function(){
-						window.location.replace("http://localhost:3000/modelViewer");
+						//window.location.replace("http://localhost:3000/modelViewer");
+						window.location.replace(redirectURL);
 					});
 				}
 			});
