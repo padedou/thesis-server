@@ -28,16 +28,19 @@ if (!isset($_GET["model"])) {
         
         <script>
             $(document).ready(function (){
+								var showHelp = true;
 								$("#btnHelp").click(function(){
 									var icon  = document.createElement("span");
 									icon.className = "glyphicon glyphicon-education";
 
-									if($("#btnHelp").text() === "Show help"){
+									if(showHelp){
 										$("#btnHelp").text("Hide Help ");
 										$("#btnHelp").append(icon);
+										showHelp = false
 									}else{
 										$("#btnHelp").text("Show Help ");
 										$("#btnHelp").append(icon);
+										showHelp = true
 									}
 								});
 
