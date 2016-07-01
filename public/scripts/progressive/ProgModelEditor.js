@@ -112,7 +112,7 @@ var ProgModelEditor = (function () {
 				domContainer.appendChild(btnCalcDiffs);
 
 				createShowModelBtn();
-				domContainer.appendChild(btnShowModel);
+				//domContainer.appendChild(btnShowModel);
 
         createRangeInput();
         domContainer.appendChild(rangeInput);
@@ -234,6 +234,8 @@ var ProgModelEditor = (function () {
 			btnCalcDiffs.style.left = '0%';
 
 			$(btnCalcDiffs).click(function(){
+				$(btnShowModel).text("Please Wait...");
+				domContainer.appendChild(btnShowModel);
 				cacheLODs();
 				sendLODs();
 			});
@@ -308,11 +310,6 @@ var ProgModelEditor = (function () {
 			var dataToSend = JSON.stringify(progMesh);
 			console.log("dataToSend.length = " + dataToSend.length);
 
-			//console.log("sending lods");
-			//console.log("data size: " + dataToSendSize);
-			//console.log(dataToSend);
-			//console.log(progMesh);
-
 			$.ajax({
 				url: "/sendlods",
 				type: "post",
@@ -323,22 +320,16 @@ var ProgModelEditor = (function () {
 				success: function(data){
 					var redirectURL = "http://" + window.location.hostname + ":3000/modelViewer";
 					console.log("lods successfully sent");
-					console.log(data);
+					//console.log(data);
 					
+					$(btnShowModel).text("Show Model");
 					$(btnShowModel).removeClass("btn-primary");
 					$(btnShowModel).addClass("btn-success");
 					$(btnShowModel).click(function(){
-						//window.location.replace("http://localhost:3000/modelViewer");
 						window.location.replace(redirectURL);
 					});
 				}
 			});
-			/*
-			for(var i = 0; i < lods.length; i++){
-				var currentFace = {};
-				currentFace.a = 
-			}
-			*/
 		}
 
     function animate() {

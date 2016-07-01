@@ -1,11 +1,9 @@
 <html>
 	<head>
-		<!--
 		<link rel="stylesheet" href="./css/bootstrap.css">
 		<link rel="stylesheet" href="./css/bootstrap-superhero.css">
 		<link rel="stylesheet" href="./css/jquery-ui.css">
 		<link rel="stylesheet" href="./css/melaxThree.css">
-		-->
 		<link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'></link> 
 
 		<script src="./scripts/jquery-2.2.4.js"></script>
@@ -34,7 +32,7 @@
 					$.ajax({
 						url: "/nextLOD",
 						success: function(data){
-							setTimeout(nextLOD, 2000);
+							setTimeout(nextLOD, 1000);
 							if(data === "restart"){
 								$("#modelIFS").attr("coordIndex", "");
 							}else{
@@ -46,31 +44,6 @@
 						}
 					});
 				};
-				/*
-				$.ajax({
-					url: "/getVertices",
-					success: function(data){
-						vertices = JSON.parse(data);
-						//console.log(vertices);
-						$("#modelCoordinate").attr("point", vertices);
-						$("#btnNextLOD").click(function(){
-							$.ajax({
-								url: "nextLOD",
-								success: function(data){
-									if(data === "restart"){
-										$("#modelIFS").attr("coordIndex", "");
-									}else{
-										var oldCoordIndex = $("#modelIFS").attr("coordIndex");
-										var newCoordIndex = vcdiff.decode(oldCoordIndex, JSON.parse(data));
-										//console.log(newCoordIndex);
-										$("#modelIFS").attr("coordIndex", newCoordIndex);
-									}
-								}
-							});
-						});
-					}
-				});
-				*/
 			});
 		</script>
 
@@ -99,5 +72,7 @@
 			</scene>
 		</x3d>	
 		<!--<button id="btnNextLOD">next lod</button>-->
+		This is an X3D scene containing the resulting progressive model. <br>
+		The LOD changes on intervals just for some preview.
 	</body>
 </html>

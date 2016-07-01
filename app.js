@@ -124,7 +124,7 @@ function saveDeltaLODfile(){
 	result.vertices = vertices;
 	result.lodDeltas = lodDeltas;
 
-	fs.writeFileSync("./tmp/foo.dl", JSON.stringify(result), "utf8");
+	//fs.writeFileSync("./tmp/foo.dl", JSON.stringify(result), "utf8");
 }
 
 function getX3Dvertices(melaxVertices){

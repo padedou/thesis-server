@@ -28,6 +28,19 @@ if (!isset($_GET["model"])) {
         
         <script>
             $(document).ready(function (){
+								$("#btnHelp").click(function(){
+									var icon  = document.createElement("span");
+									icon.className = "glyphicon glyphicon-education";
+
+									if($("#btnHelp").text() === "Show help"){
+										$("#btnHelp").text("Hide Help ");
+										$("#btnHelp").append(icon);
+									}else{
+										$("#btnHelp").text("Show Help ");
+										$("#btnHelp").append(icon);
+									}
+								});
+
 								$.ajax({
 									url: "/askModel",
 									success: runEditor
@@ -47,7 +60,18 @@ if (!isset($_GET["model"])) {
     </head>
     <body>
         <div id="mainDiv">
-            
+
+           <div class="container">
+							<button id="btnHelp" type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo"> Show Help <span class="glyphicon glyphicon-education"></span> </button>
+							<div id="demo" class="collapse">
+								This is an editor for choosing <strong>LODs</strong> that correspond to <strong>'qualityRanking'</strong> attribute of an <strong>MPD</strong> file. <br><br>
+
+								1 - Move the slider below until you reach a desired LOD. Then click the "set as qualityRanking" button to add it in the quality rankings list. <br>
+								2 - When ready click the "Calculate LOD Diffs" button. This might take a while. <br>
+								3 - Click the "Show model" button to preview an X3D scene containing the resulting progressive model.
+							</div>
+					</div> 
         </div>
+
     </body>
 </html>
