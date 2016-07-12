@@ -168,6 +168,7 @@ var ProgModelEditor = (function () {
         simplifiedFaces = numFaces;
         simplifiedVertices = t;        
 
+			
         subdividedGeometry.computeFaceNormals();
         subdividedGeometry.verticesNeedUpdate = true;
         subdividedGeometry.normalsNeedUpdate = true;
@@ -285,11 +286,11 @@ var ProgModelEditor = (function () {
 			progMesh.vertices = currentLOD.geometry.vertices;
 			progMesh.lods = lods;
 
-			console.log("lods cahed");
+			console.log("lods cached");
 			//console.log(lods);
 		}
 
-		// returns true if face is unique in the faces array
+		// Returns true if the face is unique in an array of faces.
 		function uniqueFace(facesArr, faceIndex){
 			var a = facesArr[faceIndex].a;
 			var b = facesArr[faceIndex].b;

@@ -18,7 +18,7 @@ var result // will be saved as a *.dl file
 
 var currentLOD = 0;
 
-vcdiff.blockSize = 10;
+vcdiff.blockSize = 11;
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ limit: "1024mb", extended: true }));
@@ -50,7 +50,7 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 	saveDeltaLODfile();
 
 	// saves the deltas and also saves the decoded coordIndex for some test
-	//testLODDeltas();
+	testLODDeltas();
 
 
 	//console.log(lodDeltas);
@@ -111,12 +111,13 @@ function setLODDeltas(){
 function testLODDeltas(){
 	console.log("testLODDeltas called");
 
-	/*
 	for(var deltaIndex = 0; deltaIndex < lodDeltas.length; deltaIndex++){
 		fs.writeFileSync("lod_" + deltaIndex, JSON.stringify(lodDeltas[deltaIndex]), "utf8");
 	}
-	*/
-	fs.writeFileSync("lods", JSON.stringify(lodDeltas), "utf8");
+
+	fs.writeFileSync("vertices", JSON.stringify(vertices), "utf8");
+
+	//fs.writeFileSync("lods", JSON.stringify(lodDeltas), "utf8");
 }
 
 function saveDeltaLODfile(){
