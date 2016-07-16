@@ -15,10 +15,29 @@ if (!isset($_GET["model"])) {
 			<!--<link rel="stylesheet" href="./css/bootstrap-theme.css">-->
 			<link rel="stylesheet" href="./css/melaxThree.css">
 
+<style>
+table, th, td {
+    border: 2px solid #CEBF8E;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    text-align: right;
+}
+
+.tableRankings {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+</style>
+
+
 			<script src="./scripts/jquery-2.2.4.js"></script>
 			<script src="./scripts/bootstrap.js"></script>
 			<script src="./scripts/jquery-ui.js"></script>
         
+			<script src="./scripts/TableDom.js"></script>
       <script src="./scripts/progressive/three.js"></script>
       <script src="./scripts/progressive/OrbitControls.js"></script>
       <script src="./scripts/progressive/stats.min.js"></script>
@@ -60,6 +79,8 @@ if (!isset($_GET["model"])) {
 						};
 
         </script>
+
+
     </head>
     <body>
         <div id="mainDiv">

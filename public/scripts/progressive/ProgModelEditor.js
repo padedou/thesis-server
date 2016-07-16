@@ -18,10 +18,12 @@ var ProgModelEditor = (function () {
     var simplifiedVertices = 0;
     var simplifiedFaces = 0;
 
+		var numFaces = 0;
+
 		var btnCalcDiffs;
 		var btnShowModel;
-		var lods = []; // holds the faces for every LOD, vertices should not be kept here as they do not change.
-		var progMesh = {}; // the 'progressive mesh' object to be sent.
+		var panelRankings;
+		var tableRankings;
 
     instance.loadModel = function (modelName) {
         var modelPath = "";
@@ -94,9 +96,9 @@ var ProgModelEditor = (function () {
             new THREE.MeshBasicMaterial({color: 0x405040, wireframe: true, opacity: 0.8, transparent: true})
         ];
         
-        updateSceneModel(changeLOD(range).model);
+        updateSceneModel(changeLOD(range));
 
-        renderer = new THREE.WebGLRenderer({antialias: true}); // WebGLRenderer CanvasRenderer
+        renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setClearColor(0x2B3E50);
         renderer.setSize(window.innerWidth, window.innerHeight);
         domContainer.appendChild(renderer.domElement);
@@ -110,6 +112,11 @@ var ProgModelEditor = (function () {
 
 				createCalcDiffsBtn();
 				domContainer.appendChild(btnCalcDiffs);
+
+				createTableRankings();
+				//createPanelRankings();
+				domContainer.appendChild(tableRankings.getDom());
+				//domContainer.appendChild(panelRankings);
 
 				createShowModelBtn();
 				//domContainer.appendChild(btnShowModel);
@@ -126,7 +133,7 @@ var ProgModelEditor = (function () {
         var map = sortedGeometry.map;
         var sortedVertices = sortedGeometry.vertices;
         var t = sortedVertices.length - 1;
-        var numFaces = 0;
+        //var numFaces = 0;
         var face;
         var oldFace;
         
@@ -137,6 +144,9 @@ var ProgModelEditor = (function () {
 				var result = {};
 
         t = t * r | 0;
+				numFaces = 0;
+
+				console.log(range);
 
         for (var i = 0; i < subdividedGeometry.faces.length; i++) {
             oldFace = sortedGeometry.faces[ i ];
@@ -165,6 +175,8 @@ var ProgModelEditor = (function () {
             }
         }
 
+				console.log("numFaces: " + numFaces);
+
         simplifiedFaces = numFaces;
         simplifiedVertices = t;        
 
@@ -181,14 +193,15 @@ var ProgModelEditor = (function () {
 
 				//console.log(model);
 
-				result.geometry = modelGeometry.clone();
+				//result.geometry = modelGeometry.clone();
 				//TODO: propably the name 'model' should be changed to 'modelToRender' or something
-				result.model = model;
+				//result.model = model;
 				//return model;
 
 				//console.log(result.geometry);
 
-				return result;
+				//return result;
+				return model;
     }
 
 		function updateSceneModel(model){
@@ -221,7 +234,7 @@ var ProgModelEditor = (function () {
         $(rangeInput).on("input change", function () {
             range = rangeInput.value;
             //console.log(range);
-            updateSceneModel(changeLOD(range).model);
+            updateSceneModel(changeLOD(range));
         });
     }
 
@@ -229,7 +242,7 @@ var ProgModelEditor = (function () {
 			btnCalcDiffs = document.createElement("button");
 			btnCalcDiffs.type = "button";
 			btnCalcDiffs.className = "btn btn-success btn-md";
-			btnCalcDiffs.innerHTML = ("Calculate LOD Diffs");
+			btnCalcDiffs.innerHTML = "Calculate LOD Diffs";
 			btnCalcDiffs.style.position = "absolute";
 			btnCalcDiffs.style.bottom = "100px";
 			btnCalcDiffs.style.left = '0%';
@@ -237,9 +250,36 @@ var ProgModelEditor = (function () {
 			$(btnCalcDiffs).click(function(){
 				$(btnShowModel).text("Please Wait...");
 				domContainer.appendChild(btnShowModel);
+				console.log("Functionality of btnCalcDiffs need to be modified");
+				/*
 				cacheLODs();
 				sendLODs();
+				*/
 			});
+		}
+
+		function createPanelRankings(){
+			var panelHeading = document.createElement("div");
+			panelRankings = document.createElement("div");
+			
+			panelHeading.className = "panel-heading";
+			panelHeading.innerHTML = "Table of quality rankings";
+
+			panelRankings.appendChild(panelHeading);
+			panelRankings.appendChild(tableRankings);
+		}
+
+		function createTableRankings(){
+			tableRankings = new TableDom();
+			tableRankings.setTableClass(["tableRankings"]);
+			tableRankings.setHead(["Range", "Face count"]);
+			tableRankings.appendRowData(["0.1", "100"]);
+		}
+
+		function addSomeMockData(){
+			var thead = document.createElement("thead");
+			var tbody = document.createElement("tbody");
+			
 		}
 
 		function createShowModelBtn(){
@@ -258,79 +298,8 @@ var ProgModelEditor = (function () {
 			*/
 		}
 
-		function cacheLODs(){
-			var currentLOD;
-			progMesh = {};
-			lods = [];
-
-			for(var currentRange = 0; currentRange <= 1; currentRange += step){
-				var uniqueFaces = [];
-				currentLOD = changeLOD(currentRange);
-
-				for(var faceIndex = 0; faceIndex < currentLOD.geometry.faces.length; faceIndex++){
-					if(uniqueFace(currentLOD.geometry.faces, faceIndex)){
-						var currentFace = currentLOD.geometry.faces[faceIndex];
-						var tempFace = {};
-
-						tempFace.a = currentFace.a;
-						tempFace.b = currentFace.b;
-						tempFace.c = currentFace.c;
-						//uniqueFaces.push(currentLOD.geometry.faces[faceIndex]);
-						uniqueFaces.push(tempFace);
-					}
-				}
-
-				lods.push(uniqueFaces);
-			}
-
-			progMesh.vertices = currentLOD.geometry.vertices;
-			progMesh.lods = lods;
-
-			console.log("lods cached");
-			//console.log(lods);
-		}
-
-		// Returns true if the face is unique in an array of faces.
-		function uniqueFace(facesArr, faceIndex){
-			var a = facesArr[faceIndex].a;
-			var b = facesArr[faceIndex].b;
-			var c = facesArr[faceIndex].c;
-
-			for(var i = 0; i < faceIndex; i++){
-				if(a === facesArr[i].a && b === facesArr[i].b && c === facesArr[i].c){
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		function sendLODs(){
-			//var dataToSend = JSON.stringify(lods);
-			//var dataToSendSize = dataToSend.length;
-			var dataToSend = JSON.stringify(progMesh);
-			console.log("dataToSend.length = " + dataToSend.length);
-
-			$.ajax({
-				url: "/sendlods",
-				type: "post",
-				dataType: "json",
-				//data: JSON.stringify(lods),
-				//data: {"progMesh": JSON.stringify(progMesh)},
-				data: {"progMesh": dataToSend},
-				success: function(data){
-					var redirectURL = "http://" + window.location.hostname + ":3000/modelViewer";
-					console.log("lods successfully sent");
-					//console.log(data);
-					
-					$(btnShowModel).text("Show Model");
-					$(btnShowModel).removeClass("btn-primary");
-					$(btnShowModel).addClass("btn-success");
-					$(btnShowModel).click(function(){
-						window.location.replace(redirectURL);
-					});
-				}
-			});
+			console.log("Not implemented yet");
 		}
 
     function animate() {
