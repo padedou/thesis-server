@@ -36,6 +36,7 @@ app.get("/askModel", function(req, res){
 	res.send(readyModelName);
 });
 
+/*
 app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 	console.log("req on /sendlods");
 	progMesh = JSON.parse(req.body.progMesh);
@@ -58,6 +59,21 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 	res.contentType("json");
 	res.send({"foo": "bar response"});
 	//res.end();
+});
+*/
+
+//TODO: also need to get the geometry (in the same request).
+app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, res){
+	var data = JSON.parse(req.body.data);
+	console.log(data.faces);
+	//console.log(JSON.parse(req.body.data));
+	//console.log(JSON.parse(req.body));
+	//console.log(req.body);
+	//console.log(req);
+	//console.log(req.body[0]);
+
+	res.send({"foo": "bar response"});
+	res.end();
 });
 
 //TODO: this is for exhibition purposes

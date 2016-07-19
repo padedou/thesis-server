@@ -9,8 +9,8 @@ var ProgModelEditor = (function () {
     var range = 1;
     var rangeInput;
     var subdivisions = 0;
-		//var step = 0.0001;
-		var step = 0.2;
+		var step = 0.01;
+		//var step = 0.2;
     var subdivisionMod;
     var simplifyMod;
     var sortedGeometry;
@@ -20,9 +20,9 @@ var ProgModelEditor = (function () {
 
 		var numFaces = 0;
 
-		var btnCalcDiffs;
+		var btnAddRange;
+		var btnSendRanges;
 		var btnShowModel;
-		var panelRankings;
 		var tableRankings;
 
     instance.loadModel = function (modelName) {
@@ -110,16 +110,16 @@ var ProgModelEditor = (function () {
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-				createCalcDiffsBtn();
-				domContainer.appendChild(btnCalcDiffs);
+				createAddRangeBtn();
+				domContainer.appendChild(btnAddRange);
 
 				createTableRankings();
-				//createPanelRankings();
 				domContainer.appendChild(tableRankings.getDom());
-				//domContainer.appendChild(panelRankings);
+
+				createSendRangesBtn();
+				domContainer.appendChild(btnSendRanges);
 
 				createShowModelBtn();
-				//domContainer.appendChild(btnShowModel);
 
         createRangeInput();
         domContainer.appendChild(rangeInput);
@@ -238,39 +238,23 @@ var ProgModelEditor = (function () {
         });
     }
 
-		function createCalcDiffsBtn(){
-			btnCalcDiffs = document.createElement("button");
-			btnCalcDiffs.type = "button";
-			btnCalcDiffs.className = "btn btn-success btn-md";
-			btnCalcDiffs.innerHTML = "Calculate LOD Diffs";
-			btnCalcDiffs.style.position = "absolute";
-			btnCalcDiffs.style.bottom = "100px";
-			btnCalcDiffs.style.left = '0%';
+		function createAddRangeBtn(){
+			btnAddRange = document.createElement("button");
+			btnAddRange.type = "button";
+			btnAddRange.className = "btn btn-success btn-md";
+			btnAddRange.innerHTML = "Add range";
+			btnAddRange.style.position = "absolute";
+			btnAddRange.style.bottom = "100px";
+			btnAddRange.style.left = '0%';
 
-			$(btnCalcDiffs).click(function(){
-				$(btnShowModel).text("Please Wait...");
-				domContainer.appendChild(btnShowModel);
-				console.log("Functionality of btnCalcDiffs need to be modified");
-				/*
-				cacheLODs();
-				sendLODs();
-				*/
+			$(btnAddRange).click(function(){
+				tableRankings.appendRowData([range, numFaces]);
 			});
-		}
-
-		function createPanelRankings(){
-			var panelHeading = document.createElement("div");
-			panelRankings = document.createElement("div");
-			
-			panelHeading.className = "panel-heading";
-			panelHeading.innerHTML = "Table of quality rankings";
-
-			panelRankings.appendChild(panelHeading);
-			panelRankings.appendChild(tableRankings);
 		}
 
 		function createTableRankings(){
 			tableRankings = new TableDom();
+			tableRankings.setTableId("rankingsTable");
 			tableRankings.setTableClass(["tableRankings"]);
 			tableRankings.setHead(["Range", "Face count"]);
 			tableRankings.appendRowData(["0.1", "100"]);
@@ -280,6 +264,21 @@ var ProgModelEditor = (function () {
 			var thead = document.createElement("thead");
 			var tbody = document.createElement("tbody");
 			
+		}
+
+		function createSendRangesBtn(){
+			btnSendRanges = document.createElement("button");
+			btnSendRanges.type = "button";
+			btnSendRanges.id = "btnSendRanges";
+			btnSendRanges.className = "btn btn-success btn-md";
+			btnSendRanges.innerHTML = "Send ranges";
+			btnSendRanges.style.position = "absolute";
+			btnSendRanges.style.bottom = "50px";
+			btnSendRanges.style.left = "0%";
+			
+			$(btnSendRanges).click(function(){
+				sendLODs();
+			});
 		}
 
 		function createShowModelBtn(){
@@ -296,10 +295,54 @@ var ProgModelEditor = (function () {
 				window.location.replace("http://localhost:3000/modelViewer");
 			});
 			*/
+
+			console.log("btnShowModel not fully implemented yet");
 		}
 
 		function sendLODs(){
-			console.log("Not implemented yet");
+			var rankings = getRankings();
+			var dataToSend = {};
+
+			dataToSend.rankings = rankings;
+			dataToSend.vertices = geometry.vertices;
+			dataToSend.faces = geometry.faces;
+			console.log("Not fully implemented yet");
+			//console.log(dataToSend);
+			$(btnAddRange).remove();
+			$(btnSendRanges).remove();
+			$(btnShowModel).text("Please wait");
+
+			$.ajax({
+				"url": "/sendRankings",
+				"method": "post",
+				"dataType": "json",
+				/*"data":  {"rankings": JSON.stringify(rankings)},*/
+				"data": {"data": JSON.stringify(dataToSend)},
+				"success": function(data, textStatus){
+					console.log("ajax successful");
+					console.log(data),
+					console.log(textStatus);
+				}
+			});
+
+			domContainer.appendChild(btnShowModel);
+		}
+
+		function getRankings(){
+			var domTableRows = document.getElementById("rankingsTable").rows;
+			var rankings = [];
+			//console.log(domTable.rows[0].cells[0].innerHTML);
+			//console.log(domTable.rows[0].cells[1].innerHTML);
+			for(var i = 1; i < domTableRows.length; i++){
+				var currentRanking = [];
+
+				currentRanking[0] = domTableRows[i].cells[0].innerHTML;
+				currentRanking[1] = domTableRows[i].cells[1].innerHTML;
+
+				rankings.push(currentRanking);
+			}
+
+			return rankings;
 		}
 
     function animate() {
