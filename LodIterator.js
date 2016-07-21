@@ -14,7 +14,6 @@ var LodIterator = function(){
 	var geometry;
 	var subdividedGeometry;
 	var sortedGeometry;
-	var step;
 
 	require("./SubdivisionModifier.js");
 	require("./SimplifyModifier.js");
@@ -24,12 +23,17 @@ var LodIterator = function(){
 		console.log(geometry);
 	}
 
-	// Sets the configuraion for subdividions, geometry and step
+	// Sets the configuraion for subdividions, and geometry
 
-	instance.setConfiguration = function(_subdivisions, _geometry, _step){
+	instance.setConfiguration = function(_subdivisions, _geometry){
 		subdivisions = _subdivisions;
 		geometry = _geometry;
-		step = _step;
+
+		/*
+		console.log("========== LodIterator ===========");
+		console.log(geometry.vertices);
+		console.log("==================================");
+		*/
 
 		//subdivisionMod = new THREE.SubdivisionModifier(subdivisions);
 		subdivisionMod = new THREE.SubdivisionModifier();

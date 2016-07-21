@@ -257,13 +257,6 @@ var ProgModelEditor = (function () {
 			tableRankings.setTableId("rankingsTable");
 			tableRankings.setTableClass(["tableRankings"]);
 			tableRankings.setHead(["Range", "Face count"]);
-			tableRankings.appendRowData(["0.1", "100"]);
-		}
-
-		function addSomeMockData(){
-			var thead = document.createElement("thead");
-			var tbody = document.createElement("tbody");
-			
 		}
 
 		function createSendRangesBtn(){
@@ -277,7 +270,7 @@ var ProgModelEditor = (function () {
 			btnSendRanges.style.left = "0%";
 			
 			$(btnSendRanges).click(function(){
-				sendLODs();
+				sendRankings();
 			});
 		}
 
@@ -299,15 +292,14 @@ var ProgModelEditor = (function () {
 			console.log("btnShowModel not fully implemented yet");
 		}
 
-		function sendLODs(){
+		function sendRankings(){
 			var rankings = getRankings();
 			var dataToSend = {};
 
 			dataToSend.rankings = rankings;
-			dataToSend.vertices = geometry.vertices;
 			dataToSend.faces = geometry.faces;
+			dataToSend.vertices = geometry.vertices;
 			console.log("Not fully implemented yet");
-			//console.log(dataToSend);
 			$(btnAddRange).remove();
 			$(btnSendRanges).remove();
 			$(btnShowModel).text("Please wait");
@@ -316,7 +308,6 @@ var ProgModelEditor = (function () {
 				"url": "/sendRankings",
 				"method": "post",
 				"dataType": "json",
-				/*"data":  {"rankings": JSON.stringify(rankings)},*/
 				"data": {"data": JSON.stringify(dataToSend)},
 				"success": function(data, textStatus){
 					console.log("ajax successful");

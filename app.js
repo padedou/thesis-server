@@ -3,6 +3,8 @@ var express = require('express');
 var bodyParser = require("body-parser");
 var toX3D = require("./progFace2X3D.js");
 var diffable = require("./vcdiff.js");
+var LodIterator = require("./LodIterator.js");
+var THREE = require("./three.js");
 
 var fs = require("fs");
 
@@ -62,15 +64,60 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 });
 */
 
-//TODO: also need to get the geometry (in the same request).
 app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, res){
+	//console.log(data.rankings);
 	var data = JSON.parse(req.body.data);
-	console.log(data.faces);
-	//console.log(JSON.parse(req.body.data));
-	//console.log(JSON.parse(req.body));
-	//console.log(req.body);
-	//console.log(req);
-	//console.log(req.body[0]);
+	var rankings = data.rankings;
+	//var geometry = data.geometry;
+	var geometry;
+	var lodIterator = new LodIterator();
+	var progMesh;	
+	var ranges = [];
+	var progFaces = [];
+	var progVertices;
+
+	// This is needed because when serializing an objecting, only non function attributes are kept.
+	geometry = new THREE.Geometry();
+	
+	for(var i = 0; i < data.vertices.length; i++){
+		var currentVertex = data.vertices[i];
+		geometry.vertices.push(new THREE.Vector3(currentVertex.x, currentVertex.y, currentVertex.z));
+	}
+
+	for(var i = 0; i < data.faces.length; i++){
+		var currentFace = data.faces[i];
+		geometry.faces.push(new THREE.Face3(currentFace.a, currentFace.b, currentFace.c));
+	}
+
+	for(var i = 0; i < rankings.length; i++){
+		ranges.push(rankings[i][0]);
+	}
+
+	ranges.sort(function(a, b){
+		return a - b;
+	});
+
+	for(var i = 0; i < ranges.length; i++){
+		ranges[i] = parseFloat(ranges[i]);
+	}
+
+	lodIterator.setConfiguration(1, geometry);
+	progMesh = lodIterator.getProgMesh(ranges);
+	progVertices = progMesh.vertices;
+
+	for(var i = 0; i < progMesh.faces.length; i++){
+		var tempFaces = [];
+		for(var j = 0; j < progMesh.faces[i].length; j++){
+			var temp = {};
+			temp.a = progMesh.faces[i][j].a;
+			temp.b = progMesh.faces[i][j].b;
+			temp.c = progMesh.faces[i][j].c;
+			tempFaces.push(temp);
+		}
+		progFaces.push(tempFaces);
+	}
+
+	console.log("done");
 
 	res.send({"foo": "bar response"});
 	res.end();
