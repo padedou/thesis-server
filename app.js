@@ -1,10 +1,14 @@
 var path = require("path");
 var express = require('express');
 var bodyParser = require("body-parser");
-var toX3D = require("./progFace2X3D.js");
+var progVertices2X3D = require("./progVertices2X3D.js");
+var progFace2X3D = require("./progFace2X3D.js");
+var createX3Dfile = require("./createX3Dfile.js");
 var diffable = require("./vcdiff.js");
 var LodIterator = require("./LodIterator.js");
 var THREE = require("./three.js");
+var small_uuid = require("small-uuid");
+var xmlWrapper = require("./xml-wrapper");
 
 var fs = require("fs");
 
@@ -44,7 +48,7 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 	progMesh = JSON.parse(req.body.progMesh);
 	lods = progMesh.lods;
 	//console.log(lods);
-	//console.log(toX3D(progMesh.lods[1]));
+	//console.log(toX3Dface(progMesh.lods[1]));
 
 	vertices = getX3Dvertices(progMesh.vertices);
 	// TODO: setCoordIndex and setLODDeltas SHOULD follow the getX3Dvertices paradigm
@@ -65,16 +69,16 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 */
 
 app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, res){
-	//console.log(data.rankings);
 	var data = JSON.parse(req.body.data);
 	var rankings = data.rankings;
-	//var geometry = data.geometry;
 	var geometry;
 	var lodIterator = new LodIterator();
 	var progMesh;	
 	var ranges = [];
 	var progFaces = [];
 	var progVertices;
+	var uuid;
+	var mpdModel = new MPDmodel();
 
 	// This is needed because when serializing an objecting, only non function attributes are kept.
 	geometry = new THREE.Geometry();
@@ -93,6 +97,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 		ranges.push(rankings[i][0]);
 	}
 
+	// sort ascending
 	ranges.sort(function(a, b){
 		return a - b;
 	});
@@ -103,6 +108,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 
 	lodIterator.setConfiguration(1, geometry);
 	progMesh = lodIterator.getProgMesh(ranges);
+
 	progVertices = progMesh.vertices;
 
 	for(var i = 0; i < progMesh.faces.length; i++){
@@ -116,6 +122,25 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 		}
 		progFaces.push(tempFaces);
 	}
+
+	for(var i = progFaces.length - 1; i >= 0; i--){
+		mpdModel.addLOD(i, progVertices2X3D(progVertices), progFace2X3D(progFaces[i]));
+	}
+
+	uuid = small_uuid.create();
+	createMPD(uuid, mpdModel, ["http://localhost:3000/getModel"]);
+
+	//TODO: remove 'testing' code when done
+	// start of 'testing' code
+
+	/*
+	for(var i = 0; i < progFaces.length; i++){
+		fs.writeFileSync("test_" + i + ".html", createX3Dfile(progFaces[i], progVertices), "utf8");
+	}
+	*/
+	
+	// end of 'testing' code
+
 
 	console.log("done");
 
@@ -151,7 +176,7 @@ function setCoordIndex(){
 	coordIndexArr = [];
 
 	for(var lodIndex = 0; lodIndex < lods.length; lodIndex++){
-		coordIndexArr.push(toX3D(lods[lodIndex]));
+		coordIndexArr.push(toX3Dface(lods[lodIndex]));
 	}
 }
 
@@ -209,4 +234,61 @@ function getX3Dvertices(melaxVertices){
 	}
 
 	return tempX3Dvertices;
+}
+
+function createMPD(_uuid, _mpdModel, _baseURLs){
+	var mpdLODs = _mpdModel.getLODs();
+	var nodeMPD = new xmlWrapper.GreeNode();
+	var nodePeriod = new xmlWrapper.GreeNode();
+	var nodeAdaptationSet = new xmlWrapper.GreeNode();
+
+	nodeMPD.setNodeName("MPD");
+	nodePeriod.setNodeName("Period");
+	nodeAdaptationSet.setNodeName("AdaptationSet");
+
+	for(var i = 0; i < _baseURLs.length; i++){
+		var nodeBaseURL = new xmlWrapper.GreeNode();
+
+		nodeBaseURL.setNodeName("BaseURL");
+		nodeBaseURL.setValue(_baseURLs[i] + "/" + _uuid);
+		nodeMPD.addChildNode(nodeBaseURL);
+	}
+
+	for(var i = 0; i < mpdLODs.length; i++){
+		var nodeRepresentation = new xmlWrapper.GreeNode();
+		var nodeBaseURL = new xmlWrapper.GreeNode();
+
+		nodeBaseURL.setNodeName("BaseURL");
+		nodeBaseURL.setValue("/" + mpdLODs[i].ranking);
+
+		nodeRepresentation.setNodeName("Representation");
+		nodeRepresentation.setAttributes({
+			id: i,
+			qualityRanking: mpdLODs[i].ranking
+		});
+		nodeRepresentation.addChildNode(nodeBaseURL);
+		nodeAdaptationSet.addChildNode(nodeRepresentation);
+	}
+
+	nodePeriod.addChildNode(nodeAdaptationSet);
+	nodeMPD.addChildNode(nodePeriod);
+
+	console.log(xmlWrapper.getXML(nodeMPD.getNode(), {indent: true}));
+
+}
+
+// Based on draft/progFile.js
+function MPDmodel(){
+	var instance = {};
+	var lods = [];
+
+	instance.addLOD = function(_ranking, _vertices, _faces){
+		lods.push({ranking: _ranking, vertices: _vertices, faces: _faces});
+	};
+
+	instance.getLODs = function(){
+		return lods;
+	};
+
+	return instance;
 }
