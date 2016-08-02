@@ -68,6 +68,8 @@ app.post("/sendlods", bodyParser.json({limit: "1024mb"}), function(req, res){
 });
 */
 
+// This is only for the Melax's implementaion
+
 app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, res){
 	var data = JSON.parse(req.body.data);
 	var rankings = data.rankings;
@@ -124,20 +126,32 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 		progFaces.push(tempFaces);
 	}
 
+	// i propably refers to the qualityRanking
+
 	for(var i = progFaces.length - 1; i >= 0; i--){
 		mpdModel.addLOD(i, progVertices2X3D(progVertices), progFace2X3D(progFaces[i]));
 	}
 
 	uuid = small_uuid.create();
 	mpdString = createMPD(uuid, mpdModel, ["http://localhost:3000/getModel"]);
+
+	// first save the MPD file and then save the mpdModel
+
 	fs.writeFile("./servefiles/mpd/" + uuid + ".mpd", mpdString, "utf8", (err) => {
 		if(err){
 			res.send("error");
 		}
 
-		console.log("done");
-		res.send({"foo": "bar response"});
-		res.end();
+		fs.writeFile("./servefiles/models/" + uuid + ".json", JSON.stringify(mpdModel.getLODs()), "utf8", (err) => {
+			if(err){
+				res.send("error");
+			}
+
+			console.log("done");
+			res.send({"foo": "bar response"});
+			res.end();
+		});
+
 	});
 
 	//TODO: remove 'testing' code when done
