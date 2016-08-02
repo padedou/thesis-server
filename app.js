@@ -247,9 +247,14 @@ function createMPD(_uuid, _mpdModel, _baseURLs){
 	var nodeMPD = new xmlWrapper.GreeNode();
 	var nodePeriod = new xmlWrapper.GreeNode();
 	var nodeAdaptationSet = new xmlWrapper.GreeNode();
+	var mpdResult;
+	var mpdResult_partOne;
+	var mpdResult_partTwo;
+	var hackAttributes = ' xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" profiles="urn:mpeg:dash:profile:full:2011" minBufferTime="PT0S" mediaPresentationDuration="P0D" type="static" xsi:schemaLocation="urn:mpeg:DASH:schema:MPD:2011 DASH-MPD.xsd"'
 
 	nodeMPD.setNodeName("MPD");
 	nodePeriod.setNodeName("Period");
+	nodePeriod.setAttributes({id: "3d_model"});
 	nodeAdaptationSet.setNodeName("AdaptationSet");
 
 	for(var i = 0; i < _baseURLs.length; i++){
@@ -279,9 +284,17 @@ function createMPD(_uuid, _mpdModel, _baseURLs){
 	nodePeriod.addChildNode(nodeAdaptationSet);
 	nodeMPD.addChildNode(nodePeriod);
 
-	//console.log(xmlWrapper.getXML(nodeMPD.getNode(), {indent: true}));
-	return xmlWrapper.getXML(nodeMPD.getNode(), {indent: true});
+	mpdResult = xmlWrapper.getXML(nodeMPD.getNode(), {indent: true});
 
+	// this is a hack but 'it works' :P
+	mpdResult_partOne = mpdResult.slice(0, 4);
+	mpdResult_partTwo = mpdResult.slice(4);
+
+	mpdResult = mpdResult_partOne;
+	mpdResult += hackAttributes;
+	mpdResult += mpdResult_partTwo
+	
+	return mpdResult;
 }
 
 // Based on draft/progFile.js
