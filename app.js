@@ -79,6 +79,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	var progVertices;
 	var uuid;
 	var mpdModel = new MPDmodel();
+	var mpdString;
 
 	// This is needed because when serializing an objecting, only non function attributes are kept.
 	geometry = new THREE.Geometry();
@@ -128,7 +129,16 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	}
 
 	uuid = small_uuid.create();
-	createMPD(uuid, mpdModel, ["http://localhost:3000/getModel"]);
+	mpdString = createMPD(uuid, mpdModel, ["http://localhost:3000/getModel"]);
+	fs.writeFile("./servefiles/mpd/" + uuid + ".mpd", mpdString, "utf8", (err) => {
+		if(err){
+			res.send("error");
+		}
+
+		console.log("done");
+		res.send({"foo": "bar response"});
+		res.end();
+	});
 
 	//TODO: remove 'testing' code when done
 	// start of 'testing' code
@@ -142,10 +152,6 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	// end of 'testing' code
 
 
-	console.log("done");
-
-	res.send({"foo": "bar response"});
-	res.end();
 });
 
 //TODO: this is for exhibition purposes
@@ -273,7 +279,8 @@ function createMPD(_uuid, _mpdModel, _baseURLs){
 	nodePeriod.addChildNode(nodeAdaptationSet);
 	nodeMPD.addChildNode(nodePeriod);
 
-	console.log(xmlWrapper.getXML(nodeMPD.getNode(), {indent: true}));
+	//console.log(xmlWrapper.getXML(nodeMPD.getNode(), {indent: true}));
+	return xmlWrapper.getXML(nodeMPD.getNode(), {indent: true});
 
 }
 
