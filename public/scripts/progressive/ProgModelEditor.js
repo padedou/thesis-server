@@ -311,8 +311,10 @@ var ProgModelEditor = (function () {
 				"data": {"data": JSON.stringify(dataToSend)},
 				"success": function(data, textStatus){
 					console.log("ajax successful");
-					console.log(data),
+					console.log(data);
 					console.log(textStatus);
+					$("#mainDiv").empty();
+					$("#mainDiv").html(data.htmlDirections);
 				}
 			});
 

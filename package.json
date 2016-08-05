@@ -16,6 +16,7 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
 		"xml-wraper": "file:./xml-wrapper",
-		"small-uuid": "^1.0.1"
+		"small-uuid": "^1.0.1",
+		"pug": "2.0.0-beta4"
   }
 }
