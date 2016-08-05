@@ -153,8 +153,8 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 
 			var pugOptions = {
 				pretty: "\t",
-				adaptiveModel: "http://" + hostBaseURL + "/servefiles/models/" + uuid + ".json",
-				mpd: "http://" + hostBaseURL + "/servefiles/mpd/" + uuid + ".mpd",
+				adaptiveModel: uuid,
+				mpd: "http://" + hostBaseURL + "/mpd/" + uuid + ".mpd",
 				modelID: uuid,
 				baseURL: hostBaseURL
 			};
