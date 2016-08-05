@@ -1,0 +1,23 @@
+h1 Model and the MPD are ready
+	br
+	small.
+		Follow these steps to add the adaptable model into your X3D scene
+br
+.well.well-sm
+	h2 Step 1
+	br
+	span Include 
+	strong &ltscript src = "http://#{baseURL}/x3dashPlayer.js"&gt&lt/script&gt
+	span  into your page
+.well.well-sm
+	h2 Step 2
+	br
+	span Into your X3D scene add the inline node 
+	strong &ltinline nameSpaceName = "#{modelID}" mapDEFToID = "true" url = "localhost:3000/adaptiveModel.x3d"&gt&lt/inline&gt
+.well.well-sm
+	h2 Step 3
+	br
+	span When document is ready add a refrence of the model and the MPD file, into the dash player.
+	br
+	span e.g.:
+	strong x3dashPlayer.addModel("#{adaptiveModel}", "#{mpd}");
