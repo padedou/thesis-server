@@ -180,8 +180,35 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	// end of 'testing' code
 });
 
-app.get("/getModel/:uuid", function(req, res){
-	
+app.get("/getModel/:uuid/:qualityRanking", function(req, res){
+	var uuid = req.params.uuid;
+	var requestingQR = req.params.qualityRanking;
+	var cachedQualityRanking = req.query.currentQR;
+
+	/*
+	console.log("getModel");
+	console.log(uuid);
+	console.log(requestingQR);
+	console.log(cachedQualityRanking);
+	*/
+
+	// read the model
+	fs.readFile("./serve_models/" + uuid + ".json", "utf8", (err, data) => {
+		if(err){
+			throw err;
+		}else{
+			var adaptiveModel = JSON.parse(data);
+			var diff;
+
+			if(cachedQualityRanking > -1){
+				diff = getLODdelta(getQualityRankingGeometry(cachedQualityRanking), getQualityRankingGeometry(requestingQR));
+				res.send(JSON.stringify(diff));
+			}else{
+				res.send(JSON.stringify(getQualityRankingGeometry(requestingQR)));
+			}
+		}
+		
+	})
 });
 
 //TODO: this is for exhibition purposes
@@ -341,4 +368,25 @@ function MPDmodel(){
 	};
 
 	return instance;
+}
+
+/*
+*	Gets two objects representing the previous and the next LOD.
+*	LOD object is in the form {vertices: 'Coordinate point', faces: 'IndexedFaceSet coordIndex'}
+*/
+function getLODdelta(_prevLOD, _nextLOD){
+	var diff = {};
+	
+	diff.vertices = vcdiff.encode(_prevLOD.vertices, _nextLOD.vertices);
+	diff.faces = vcdiff.encode(_prevLOD.faces, _nextLOD.faces);
+
+	return diff;
+}
+
+function getQualityRankingGeometry(_adaptiveModel, _qualityRanking){
+	for(var i = 0; i < _adaptiveModel.length; i++){
+		if(_adaptiveModel[i].ranking === _qualityRanking){
+			return _adaptiveModel[i];
+		}
+	}
 }
