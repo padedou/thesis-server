@@ -10,6 +10,7 @@ var THREE = require("./three.js");
 var small_uuid = require("small-uuid");
 var xmlWrapper = require("./xml-wrapper");
 var pug = require("pug");
+var cors = require("cors");
 
 var fs = require("fs");
 
@@ -30,8 +31,9 @@ pugString = fs.readFileSync("./directions.pug", "utf8");
 
 vcdiff.blockSize = 11;
 
-app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ limit: "1024mb", extended: true }));
+app.use(cors());
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", function(req, res){
 	res.sendFile(path.join(__dirname, "views/index.html"));
@@ -207,8 +209,7 @@ app.get("/getModel/:uuid/:qualityRanking", function(req, res){
 				res.send(JSON.stringify(getQualityRankingGeometry(requestingQR)));
 			}
 		}
-		
-	})
+	});
 });
 
 //TODO: this is for exhibition purposes

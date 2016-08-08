@@ -1,4 +1,6 @@
 *.swp
+foo
+TODO.txt
 # 'Delta LOD' file type
 *.dl
 public/css/bootstrap.css
@@ -10,7 +12,12 @@ public/scripts/bootstrap.js
 public/scripts/jquery-2.2.4.js
 public/scripts/jquery-ui.js
 public/scripts/progressive/models/*
+public/mpd
+serve_models
 node_modules
+xml-wrapper
 draft
 tmp
+servefiles
 vcdiff.js
+TableDom.js
