@@ -7,7 +7,7 @@ var createX3Dfile = require("./createX3Dfile.js");
 var diffable = require("./vcdiff.js");
 var LodIterator = require("./LodIterator.js");
 var THREE = require("./three.js");
-var small_uuid = require("small-uuid");
+var node_uuid = require("node-uuid");
 var xmlWrapper = require("./xml-wrapper");
 var pug = require("pug");
 var cors = require("cors");
@@ -138,7 +138,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 		mpdModel.addLOD(i, progVertices2X3D(progVertices), progFace2X3D(progFaces[i]));
 	}
 
-	uuid = small_uuid.create();
+	uuid = node_uuid.v1();
 	mpdString = createMPD(uuid, mpdModel, ["http://" + hostBaseURL + "/getModel"]);
 
 	// first save the MPD file and then save the mpdModel
