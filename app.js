@@ -90,6 +90,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	var mpdString;
 
 	// This is needed because when serializing an objecting, only non function attributes are kept.
+
 	geometry = new THREE.Geometry();
 	
 	for(var i = 0; i < data.vertices.length; i++){
@@ -107,6 +108,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	}
 
 	// sort ascending
+
 	ranges.sort(function(a, b){
 		return a - b;
 	});
@@ -184,35 +186,30 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 
 app.get("/getModel/:uuid/:qualityRanking", function(req, res){
 	var uuid = req.params.uuid;
-	var requestingQR = req.params.qualityRanking;
-	var cachedQualityRanking = req.query.currentQR;
-
-	/*
-	console.log("getModel");
-	console.log(uuid);
-	console.log(requestingQR);
-	console.log(cachedQualityRanking);
-	*/
+	var requestingQR = parseInt(req.params.qualityRanking, 10);
+	var cachedQualityRanking = parseInt(req.query.currentQR, 10);
 
 	// read the model
+
 	fs.readFile("./serve_models/" + uuid + ".json", "utf8", (err, data) => {
 		if(err){
 			throw err;
 		}else{
 			var adaptiveModel = JSON.parse(data);
 			var diff;
-
+	
 			if(cachedQualityRanking > -1){
-				diff = getLODdelta(getQualityRankingGeometry(cachedQualityRanking), getQualityRankingGeometry(requestingQR));
+				diff = getLODdelta(getQualityRankingGeometry(adaptiveModel, cachedQualityRanking), getQualityRankingGeometry(adaptiveModel, requestingQR));
 				res.send(JSON.stringify(diff));
 			}else{
-				res.send(JSON.stringify(getQualityRankingGeometry(requestingQR)));
+				res.send(JSON.stringify(getQualityRankingGeometry(adaptiveModel, requestingQR)));
 			}
 		}
 	});
 });
 
 //TODO: this is for exhibition purposes
+
 app.get("/modelViewer", function(req, res){
 	res.sendFile(path.join(__dirname, "views/modelViewer.html"));
 });
@@ -268,7 +265,6 @@ function testLODDeltas(){
 	}
 
 	fs.writeFileSync("vertices", JSON.stringify(vertices), "utf8");
-
 	//fs.writeFileSync("lods", JSON.stringify(lodDeltas), "utf8");
 }
 
@@ -286,8 +282,6 @@ function getX3Dvertices(melaxVertices){
 	
 	for(var i = 0; i < melaxVertices.length; i++){
 		currentVertex = melaxVertices[i];
-
-		//console.log(currentVertex);
 
 		tempX3Dvertices += currentVertex.x;
 		tempX3Dvertices += " ";
@@ -345,6 +339,7 @@ function createMPD(_uuid, _mpdModel, _baseURLs){
 	mpdResult = xmlWrapper.getXML(nodeMPD.getNode(), {indent: true});
 
 	// this is a hack but 'it works' :P
+
 	mpdResult_partOne = mpdResult.slice(0, 4);
 	mpdResult_partTwo = mpdResult.slice(4);
 
@@ -356,6 +351,7 @@ function createMPD(_uuid, _mpdModel, _baseURLs){
 }
 
 // Based on draft/progFile.js
+
 function MPDmodel(){
 	var instance = {};
 	var lods = [];
@@ -375,6 +371,7 @@ function MPDmodel(){
 *	Gets two objects representing the previous and the next LOD.
 *	LOD object is in the form {vertices: 'Coordinate point', faces: 'IndexedFaceSet coordIndex'}
 */
+
 function getLODdelta(_prevLOD, _nextLOD){
 	var diff = {};
 	

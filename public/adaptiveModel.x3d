@@ -1,3 +1,5 @@
+<x3d>
+<scene>
 <Transform DEF="ifs_transform" translation="0.000000 0.000000 0.000000" scale="1.000000 1.000000 1.000000" rotation="1.000000 0.000000 0.000000 0.000000">
     <Shape>
         <Appearance>
@@ -8,3 +10,5 @@
         </IndexedFaceSet>
     </Shape>
 </Transform>
+</scene>
+</x3d>
