@@ -3,6 +3,7 @@ foo
 TODO.txt
 # 'Delta LOD' file type
 *.dl
+public/*
 public/css/bootstrap.css
 public/css/bootstrap-superhero.css
 public/css/bootstrap-theme.css
