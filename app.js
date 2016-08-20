@@ -39,6 +39,14 @@ app.get("/", function(req, res){
 	res.sendFile(path.join(__dirname, "views/index.html"));
 });
 
+app.get("/continuousStart", function(req, res){
+	res.sendFile(path.join(__dirname, "views/continuousStart.html"));
+});
+
+app.get("/discreteStart", function(req, res){
+	res.sendFile(path.join(__dirname, "views/discreteStart.html"));
+});
+
 app.get("/readyModel", function(req, res){
 	readyModelName = req.query.model;
 	res.sendFile(path.join(__dirname, "views/readyModel.html"));

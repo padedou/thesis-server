@@ -1,76 +1,58 @@
 <html>
-    <head>
+	<head>
+		<link rel="stylesheet" href="./css/bootstrap.css">
+		<link rel="stylesheet" href="./css/bootstrap-superhero.css">
+		<link rel="stylesheet" href="./css/jquery-ui.css">
+		<!--<link rel="stylesheet" href="./css/bootstrap-theme.css">-->
+		<link rel="stylesheet" href="./css/melaxThree.css">
 
-<link rel="stylesheet" href="./css/bootstrap.css">
-<link rel="stylesheet" href="./css/bootstrap-superhero.css">
-<link rel="stylesheet" href="./css/jquery-ui.css">
-<!--<link rel="stylesheet" href="./css/bootstrap-theme.css">-->
-<link rel="stylesheet" href="./css/melaxThree.css">
+		<script src="./scripts/jquery-2.2.4.js"></script>
+		<script src="./scripts/bootstrap.js"></script>
+		<script src="./scripts/jquery-ui.js"></script>
 
-<script src="./scripts/jquery-2.2.4.js"></script>
-<script src="./scripts/bootstrap.js"></script>
-<script src="./scripts/jquery-ui.js"></script>
+		<script>
+			$(document).ready(function(){
+				console.log("document is ready");
 
-        <script>
-            $(document).ready(function () {
-                //console.log("hellooooo");
-                $("#btnListGo").click(function (){
-                    var model = $( "#model_list option:selected" ).text();
-                    var location = "/readyModel?model=" + model;
-                    window.location.href = location;
-                    //console.log($( "#model_list option:selected" ).text());
-                });
-            });
-        </script>
-    </head>
+				$("#fooContinuous").click(function(){
+					window.location.href = "/continuousStart";
+				});
 
-    <body>
-        <!-- main div container -->
-        <div class="container-fluid">
-            <!-- left span -->
-            <div class="col-md-3"></div>
+				$("#fooDiscrete").click(function(){
+					window.location.href = "/discreteStart";
+				});
+			});
+		</script>
+	</head>
 
-            <!-- content div -->
-            <div class="col-md-6">
-                <!-- ready model -->
-                <div class="well well-lg">
-                   
-                        <h1>Select a model</h1>
+	<body>
 
-                        <div class="col-md-10">
-                            <select class="form-control" id="model_list">
-                                <!--<option>Walthead</option>-->
-                                <option>Suzanne</option>
-																<option>Cow</option>
-																<option>Torus Decimated</option>
-																<option>Torus Full</option>
-																<option>suzanne2</script>
-																<option>suzanne3</script>
-                                <!--<option>Bunny</option>-->
-                            </select>
-                        </div>
+		<div class = "container-fluid">
+			<p>
+				<h1> Select what you want to use</h1>
+			</p>
 
-                        <div class="col-md-2">
-                            <button id="btnListGo" type="button" class="btn btn-success">
-                                <span class="glyphicon glyphicon-arrow-right"></span>
-                            </button>
-                        </div>
-                        
-                        <br><br>
-                   
-                </div>
+			<br>
 
-                <!-- upload new model -->
-                <div class="well well-lg">
-                    <h1>Upload a new model</h1>
-                    <div class="alert alert-warning" role="alert"> Currently only *.obj files are supported </div>
-                    <div class="alert alert-danger" role="alert"> Not implemented yet </div>
-                </div>
+			<p>
+				<h2 id = "fooContinuous"> Continuous LOD </h2>
 
-            </div>
+				<br>
 
-            <!-- right span -->
-            <div class="col-md-3"></div>
-        </div>
-    </body>
+				{Insert a small description for the Continuous LOD}
+			</p>
+
+			<br>
+
+			<p>
+				<h2 id = "fooDiscrete"> Discrete LOD </h2>
+
+				<br>
+
+				{Insert a small description for the Discrete LOD}
+			</p>
+
+		</div>
+
+	</body>
 </html>
