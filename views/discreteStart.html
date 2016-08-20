@@ -1,1 +1,215 @@
+<html>
+	<head>
 
+			<link rel="stylesheet" href="./css/bootstrap.css">
+			<!-- <link rel="stylesheet" href="./css/bootstrap-superhero.css"> -->
+			<!-- <link rel="stylesheet" href="./css/jquery-ui.css"> -->
+
+			<script src="./scripts/jquery-2.2.4.js"></script>
+			<script src="./scripts/bootstrap.js"></script>
+			<!-- <script src="./scripts/jquery-ui.js"></script> -->
+
+			<style>
+				body {
+					font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+					font-size: 15px;
+					line-height: 1.42857143;
+					color: #ebebeb;
+					background-color: #2b3e50;
+				}
+
+				.bandwidth-input{
+					color: black;
+				}
+
+				.btn {
+					display: inline-block;
+					margin-bottom: 0;
+					font-weight: normal;
+					text-align: center;
+					vertical-align: middle;
+					-ms-touch-action: manipulation;
+					touch-action: manipulation;
+					cursor: pointer;
+					background-image: none;
+					border: 1px solid transparent;
+					white-space: nowrap;
+					padding: 8px 16px;
+				 	font-size: 15px;
+				 	line-height: 1.42857143;
+				 	border-radius: 0;
+				 	-webkit-user-select: none;
+				 	-moz-user-select: none;
+				 	-ms-user-select: none;
+				 	user-select: none;
+				}
+
+				.btn-primary {
+					background-color:	#df691a;
+				}
+			</style>
+
+		<script src = ./scripts/TableDom.js></script>
+
+		<script>
+			$(document).ready(function(){
+				var table = new TableDom();
+				var qualityRankingCounter = 0;
+				/*
+				*	{
+				*		string: stub,
+				*		object array: lods[ {string: qualityRanking, string: bandwidth, string: vertices, string faces} ],
+				*	}
+				*/
+				var adaptiveModel = {};
+
+				adaptiveModel.stub = " ";
+				adaptiveModel.lods = []
+
+				table.setTableID("table_1");
+				table.setTableClass(["table"]);
+				table.setHead(["Quality Ranking", "Bandwidth", "File"]);
+				addLOD();
+
+
+				$("#btnAdd").click(function(){
+					addLOD();
+				});
+
+				$("#btnSend").click(function(){
+					
+					// add the bandwidth values
+
+					for(var i = 0; i < adaptiveModel.lods.length; i++){
+						var bandwidthID = "bandwidth_" + i;
+
+						if($("#" + bandwidthID).val().length < 1){
+							alert("Please fill the 'Bandwidth' fields");
+							return;
+						}
+
+						//adaptiveModels[i].bandwidth = $("#" + bandwidthID).val();
+						adaptiveModel.lods[i].bandwidth = $("#" + bandwidthID).val();
+					}
+
+					console.log(adaptiveModel);
+				});
+
+
+				function addLOD(){
+					table.appendRowData([
+						"<div id = 'qualityRanking_" + qualityRankingCounter + "'>" + qualityRankingCounter + "</div>",
+						"<input id = 'bandwidth_" + qualityRankingCounter + "' type = 'text' class = 'bandwidth-input'>",
+						"<input id = 'lodFile_" + qualityRankingCounter + "' type = 'file' accept = '.x3d'>"
+					]);
+
+
+					$("#tablePlaceholder").append(table.getDom());
+					$("#lodFile_" + qualityRankingCounter).on("change", readFile);
+					qualityRankingCounter++;
+					//$(".lodFile").on("change", readFile);
+				}
+
+				function readFile(_event){
+					var input = _event.target;
+					var reader = new FileReader();
+					var partialIdentifier = _event.target.id.split("_")[1];
+
+					$("#btnSend").attr("disabled", true);
+
+					reader.onload = function(){
+						var qualityRankingID = "qualityRanking_" + partialIdentifier;
+						var bandwidthID = "bandwidth_" + partialIdentifier;
+						var fileID = "lodFile_" + partialIdentifier;
+						var currentLOD = {};
+						var docXML = $.parseXML(reader.result);
+						var nodeIFS = $(docXML).find("IndexedFaceSet")[0];
+						var nodeCoordinate = $(docXML).find("Coordinate")[0];
+						var faces = $(nodeIFS).attr("coordIndex");
+						var vertices = $(nodeCoordinate).attr("point");
+
+						console.log("file loaded");
+
+						currentLOD.qualityRanking = $("#" + qualityRankingID).text();
+						currentLOD.faces = faces;
+						currentLOD.vertices = vertices;
+
+						if(adaptiveModel.stub === " "){
+							var xmlSerializer = new XMLSerializer();
+							var nodeGroup = docXML.createElement("Group");
+							var nodeCollectionShape = $(docXML).find("Shape");
+							var nodeIFSParent;
+							var nodeShapeParent;
+							var nodeGroup = docXML.createElement("Group");
+
+							$(nodeGroup).attr("DEF", "ifs_transform");
+
+							$(nodeIFS).attr("coordIndex", " ");
+							$(nodeCoordinate).attr("point", " ");
+							
+							for(var nodeCurrentShape of nodeCollectionShape){
+								if($(nodeCurrentShape).find("IndexedFaceSet").length === 1){
+									nodeIFSParent = nodeCurrentShape;
+									nodeShapeParent = $(nodeCurrentShape).parent()[0];
+									break;
+								}
+							}
+
+							$(nodeShapeParent).append(nodeGroup);
+							$(nodeIFSParent).appendTo(nodeGroup);
+
+							adaptiveModel.stub = xmlSerializer.serializeToString(docXML);
+						}
+
+						adaptiveModel.lods.push(currentLOD);
+						$("#btnSend").attr("disabled", false);
+
+					};
+
+					reader.readAsText(input.files[0]);
+				}
+			});
+		</script>
+
+	</head>
+	<body>
+		<!--
+		This page tests an html table which contains html elements. 
+		<br><br>
+
+		<div id = "tablePlaceholder"></div>
+		<br><br>
+
+		<button id = "btnAdd">Add row</button>
+		<button id = "btnSend">Send LODs</button>
+		<button id = "btnDisable">Disable</button>
+		<button id = "btnFoo">Foo</button>
+		<button id = "btnClearBody">Clear body</button>
+		<button id = "btnParse">Parse LOD 0 </button>
+		-->
+
+		<!-- main div -->
+		<div class = "container-fluid">
+			<!-- left span -->
+			<div class = "col-md-2">
+			</div>
+			<!-- menu -->
+			<div class = "col-md-8">
+				<h1> Add your x3d files starting from the lowest LOD </h1>
+				<hr>
+				<br><br>
+
+				<div id = "tablePlaceholder"></div>
+
+				<br><br>
+
+				<button id = "btnAdd" type = "button" class = "btn btn-primary">Add LOD</button>
+				<button id = "btnSend" type = "button" class = "btn btn-primary">Send LODs</button>
+			</div>
+			<!-- right span -->
+	    <div class = "col-md-2">
+			</div>
+		</div>
+
+	</body>
+</html>
