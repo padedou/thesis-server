@@ -24,10 +24,12 @@ var coordIndexArr = [];
 var lodDeltas = [];
 var result // will be saved as a *.dl file
 var hostBaseURL = "localhost:3000";
-var pugString;
+var pugStringContinuous;
+var pugStringDiscrete;
 var currentLOD = 0;
 
-pugString = fs.readFileSync("./directions.pug", "utf8");
+pugStringContinuous = fs.readFileSync("./directionsContinuous.pug", "utf8");
+pugStringDiscrete = fs.readFileSync("./directionsDiscrete.pug", "utf8");
 
 vcdiff.blockSize = 11;
 
@@ -171,7 +173,7 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 				baseURL: hostBaseURL
 			};
 
-			var htmlString = pug.render(pugString, pugOptions);
+			var htmlString = pug.render(pugStringContinuous, pugOptions);
 
 			console.log(uuid + " is ready.");
 			res.send({htmlDirections: htmlString});
@@ -214,21 +216,26 @@ app.post("/discrete/sendLODs", function(req, res){
 				res.status(500).send("Could not create the progressive model");
 			}
 
-			var pugOptions = {
-				pretty: "\t",
-				adaptiveModel: uuid,
-				mpd: "http://" + hostBaseURL + "/mpd/" + uuid + ".mpd",
-				modelID: uuid,
-				baseURL: hostBaseURL
-			};
+			fs.writeFile("./public/modelStubs/" + uuid + ".x3d", data.stub, "utf8", (err) =>{
+				if(err){
+					res.status(500).send("Could not save the model's stub");
+				}
 
-			var htmlString = pug.render(pugString, pugOptions);
+				var pugOptions = {
+					pretty: "\t",
+					adaptiveModel: uuid,
+					mpd: "http://" + hostBaseURL + "/mpd/" + uuid + ".mpd",
+					modelID: uuid,
+					baseURL: hostBaseURL
+				};
 
-			console.log(uuid + " is ready.");
-			res.send({htmlDirections: htmlString});
-			res.end();
+				var htmlString = pug.render(pugStringDiscrete, pugOptions);
+
+				console.log(uuid + " is ready.");
+				res.send({htmlDirections: htmlString});
+				res.end();
+			});
 		});
-
 	});
 });
 
