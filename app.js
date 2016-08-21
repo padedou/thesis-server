@@ -192,6 +192,46 @@ app.post("/sendRankings", /*bodyParser.json({limit: "1024mb"}),*/ function(req, 
 	// end of 'testing' code
 });
 
+app.post("/discrete/sendLODs", function(req, res){
+	var data = JSON.parse(req.body.data);
+	var uuid = node_uuid.v1();
+	var mpdModel = new MPDmodel();
+	var mpdString;
+
+	for(var i = 0; i < data.lods.length; i++){
+		mpdModel.addLOD(data.lods[i].qualityRanking, data.lods[i].vertices, data.lods[i].faces, data.lods[i].bandwidth);
+	}
+
+	mpdString = createMPD(uuid, mpdModel, ["http://" + hostBaseURL + "/getModel"]);
+
+	fs.writeFile("./public/mpd/" + uuid + ".mpd", mpdString, "utf8", (err) => {
+		if(err){
+			res.status(500).send("Could not create the MPD file");
+		}
+
+		fs.writeFile("./serve_models/" + uuid + ".json", JSON.stringify(mpdModel.getLODs()), "utf8", (err) => {
+			if(err){
+				res.status(500).send("Could not create the progressive model");
+			}
+
+			var pugOptions = {
+				pretty: "\t",
+				adaptiveModel: uuid,
+				mpd: "http://" + hostBaseURL + "/mpd/" + uuid + ".mpd",
+				modelID: uuid,
+				baseURL: hostBaseURL
+			};
+
+			var htmlString = pug.render(pugString, pugOptions);
+
+			console.log(uuid + " is ready.");
+			res.send({htmlDirections: htmlString});
+			res.end();
+		});
+
+	});
+});
+
 app.get("/getModel/:uuid/:qualityRanking", function(req, res){
 	var uuid = req.params.uuid;
 	var requestingQR = parseInt(req.params.qualityRanking, 10);
@@ -328,15 +368,27 @@ function createMPD(_uuid, _mpdModel, _baseURLs){
 	for(var i = 0; i < mpdLODs.length; i++){
 		var nodeRepresentation = new xmlWrapper.GreeNode();
 		var nodeBaseURL = new xmlWrapper.GreeNode();
+		var attrRepresentation = {};
 
 		nodeBaseURL.setNodeName("BaseURL");
 		nodeBaseURL.setValue("/" + mpdLODs[i].ranking);
 
 		nodeRepresentation.setNodeName("Representation");
+
+		if(mpdLODs[i].bandwidth){
+			attrRepresentation.bandwidth = mpdLODs[i].bandwidth;
+		}
+
+		attrRepresentation.id = i;
+		attrRepresentation.qualityRanking = mpdLODs[i].ranking;
+
+		nodeRepresentation.setAttributes(attrRepresentation);
+		/*
 		nodeRepresentation.setAttributes({
 			id: i,
 			qualityRanking: mpdLODs[i].ranking
 		});
+		*/
 		nodeRepresentation.addChildNode(nodeBaseURL);
 		nodeAdaptationSet.addChildNode(nodeRepresentation);
 	}
@@ -364,8 +416,14 @@ function MPDmodel(){
 	var instance = {};
 	var lods = [];
 
-	instance.addLOD = function(_ranking, _vertices, _faces){
-		lods.push({ranking: _ranking, vertices: _vertices, faces: _faces});
+	instance.addLOD = function(_ranking, _vertices, _faces, _bandwidth){
+		if(_bandwidth){
+			if(parseInt(_bandwidth, 10) > 0){
+				lods.push({ranking: parseInt(_ranking, 10), vertices: _vertices, faces: _faces, bandwidth: _bandwidth});
+			}
+		}else{
+			lods.push({ranking: parseInt(_ranking, 10), vertices: _vertices, faces: _faces});
+		}
 	};
 
 	instance.getLODs = function(){

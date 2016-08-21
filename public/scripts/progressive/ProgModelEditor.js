@@ -254,7 +254,7 @@ var ProgModelEditor = (function () {
 
 		function createTableRankings(){
 			tableRankings = new TableDom();
-			tableRankings.setTableId("rankingsTable");
+			tableRankings.setTableID("rankingsTable");
 			tableRankings.setTableClass(["tableRankings"]);
 			tableRankings.setHead(["Range", "Face count"]);
 		}

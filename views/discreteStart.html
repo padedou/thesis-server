@@ -92,7 +92,21 @@
 						adaptiveModel.lods[i].bandwidth = $("#" + bandwidthID).val();
 					}
 
-					console.log(adaptiveModel);
+					$.ajax({
+						"url": "/discrete/sendLODs",
+						"method": "post",
+						"dataType": "json",
+						"data": {"data": JSON.stringify(adaptiveModel)},
+						"success": function(data, textStatus){
+							console.log("ajax successful");
+							console.log(data);
+							console.log(textStatus);
+							$("body").empty();
+							$("body").html(data.htmlDirections);
+						}
+					});
+
+					//console.log(adaptiveModel);
 				});
 
 
