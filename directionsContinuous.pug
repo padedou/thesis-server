@@ -7,7 +7,11 @@ br
 	h2 Step 1
 	br
 	span Include 
+	br
+	strong &ltscript src = "http://#{baseURL}/vcdiff.js"&gt&lt/script&gt
+	br
 	strong &ltscript src = "http://#{baseURL}/x3dashPlayer.js"&gt&lt/script&gt
+	br
 	span  into your page
 .well.well-sm
 	h2 Step 2
@@ -17,10 +21,12 @@ br
 .well.well-sm
 	h2 Step 3
 	br
-	span When document is ready add a refrence of the model and the MPD file, into the dash player.
+	span When document is ready add a refrence of the model and the MPD file, into the dash player and call the start method..
 	br
 	span Example:
 	br
 	strong var player = new x3dash.Player();
 	br
 	strong player.addModel("#{adaptiveModel}", "#{mpd}");
+	br
+	strong player.start();
