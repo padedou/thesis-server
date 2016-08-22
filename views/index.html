@@ -4,7 +4,12 @@
 		<link rel="stylesheet" href="./css/bootstrap-superhero.css">
 		<link rel="stylesheet" href="./css/jquery-ui.css">
 		<!--<link rel="stylesheet" href="./css/bootstrap-theme.css">-->
-		<link rel="stylesheet" href="./css/melaxThree.css">
+		<!--<link rel="stylesheet" href="./css/melaxThree.css">-->
+		<style>
+			.btn-option {
+				background-color: #1B3146;
+			}
+		</style>
 
 		<script src="./scripts/jquery-2.2.4.js"></script>
 		<script src="./scripts/bootstrap.js"></script>
@@ -14,11 +19,11 @@
 			$(document).ready(function(){
 				console.log("document is ready");
 
-				$("#fooContinuous").click(function(){
+				$("#btnContinuous").click(function(){
 					window.location.href = "/continuousStart";
 				});
 
-				$("#fooDiscrete").click(function(){
+				$("#btnDiscrete").click(function(){
 					window.location.href = "/discreteStart";
 				});
 			});
@@ -28,31 +33,41 @@
 	<body>
 
 		<div class = "container-fluid">
+		<!-- left div span -->
+		<div class = "col-md-2">
+		</div>
+
+		<!-- main div -->
+		<div class = "col-md-8">
 			<p>
 				<h1> Select what you want to use</h1>
 			</p>
 
 			<br>
 
-			<p>
-				<h2 id = "fooContinuous"> Continuous LOD </h2>
+				<div class = "well well-sm">
+					<button type = "button" id = "btnContinuous" class = "btn btn-option"> Continuous LOD </button>
 
-				<br>
+					<br>
 
-				{Insert a small description for the Continuous LOD}
-			</p>
+					In this implementation we use the Stan Melax's algorithm - <a href = "http://www.melax.com/polychop">Easy Mesh Simplification </a>
+					<br>
+					Ported from C++ to Javascript on the Three.js by Joshua Koo - <a href = "https://github.com/mrdoob/three.js/blob/302c693b27663d4d280b156b5ebe4ed38cd062e4/examples/js/modifiers/SimplifyModifier.js"> SimplifyModifier.js</a>
+				</div>
 
 			<br>
 
-			<p>
-				<h2 id = "fooDiscrete"> Discrete LOD </h2>
+				<div class = "well well-sm">
+					<button type = "button" id = "btnDiscrete" class = "btn btn-option"> Discrete LOD </button>
 
-				<br>
+					<br>
 
-				{Insert a small description for the Discrete LOD}
-			</p>
-
+					{Insert a small description for the Discrete LOD}
+				</div>
 		</div>
+
+		<!-- right div span -->
+		<div class = "col-md-2">
 
 	</body>
 </html>
