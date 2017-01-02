@@ -1,17 +1,18 @@
 {
-  "name": "melax_diff",
-  "version": "0.0.0",
-  "description": "Web app for progressive meshes",
+  "name": "x3dash_server",
+  "version": "0.1.2",
+  "description": "Serving LODs for MPEG-DASH enabled X3D players",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "melax",
-    "three.js"
+    "three.js",
+		"LOD"
   ],
   "author": "padedou",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
