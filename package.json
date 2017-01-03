@@ -8,9 +8,12 @@
 		"start": "node ./app.js"
   },
   "keywords": [
+		"mpeg",
+		"dash",
+		"x3d",
+		"LOD",
     "melax",
-    "three.js",
-		"LOD"
+    "three.js"
   ],
   "author": "padedou",
   "license": "MIT",
