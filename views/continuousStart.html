@@ -20,6 +20,10 @@
                     window.location.href = location;
                     //console.log($( "#model_list option:selected" ).text());
                 });
+
+								$("#btnUploadGo").click(function(){
+                	window.location.href = "/uploadModel";
+								});
             });
         </script>
     </head>
@@ -62,9 +66,17 @@
 
                 <!-- upload new model -->
                 <div class="well well-lg">
+										<div>
+										</div>
                     <h1>Upload a new model</h1>
-                    <div class="alert alert-warning" role="alert"> Currently only *.obj files are supported </div>
-                    <div class="alert alert-danger" role="alert"> Not implemented yet </div>
+
+                    	<button id="btnUploadGo" type="button" class="btn btn-success">
+												<span class="glyphicon glyphicon-arrow-right"></span>
+											</button>
+
+										<br><br><br>
+                    <div class="alert alert-warning" role="alert"> Currently only Three.js json model files are supported </div>
+                    <!--<div class="alert alert-danger" role="alert"> Not implemented yet </div>-->
                 </div>
 
             </div>

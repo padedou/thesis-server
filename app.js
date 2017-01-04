@@ -54,6 +54,11 @@ app.get("/readyModel", function(req, res){
 	res.sendFile(path.join(__dirname, "views/readyModel.html"));
 });
 
+app.get("/uploadModel", function(req, res){
+	readyModelName = req.query.model;
+	res.sendFile(path.join(__dirname, "views/uploadModel.html"));
+});
+
 app.get("/askModel", function(req, res){
 	res.send(readyModelName);
 });
