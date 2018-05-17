@@ -460,6 +460,8 @@ function getLODdelta(_prevLOD, _nextLOD){
 }
 
 function getQualityRankingGeometry(_adaptiveModel, _qualityRanking){
+	// This function need to be refactored
+
 	for(var i = 0; i < _adaptiveModel.length; i++){
 		if(_adaptiveModel[i].ranking === _qualityRanking){
 			return _adaptiveModel[i];

@@ -5,13 +5,13 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node ./app.js"
+    "start": "node ./app.js"
   },
   "keywords": [
-		"mpeg",
-		"dash",
-		"x3d",
-		"LOD",
+    "mpeg",
+    "dash",
+    "x3d",
+    "LOD",
     "melax",
     "three.js"
   ],
@@ -20,9 +20,9 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-		"xml-wraper": "file:./xml-wrapper",
-		"node-uuid": "^1.4.7",
-		"pug": "2.0.0-beta4",
-		"cors": "^2.7.1"
+    "xml-wraper": "file:./xml-wrapper",
+    "node-uuid": "^1.4.7",
+    "pug": "2.0.0-beta4",
+    "cors": "^2.7.1"
   }
 }
